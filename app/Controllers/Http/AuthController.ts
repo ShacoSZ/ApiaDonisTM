@@ -101,22 +101,24 @@ export default class AuthController {
 
 
 
-  public async verificarToken({ request,auth }: HttpContextContract)
-  {
+  public async verificarToken({ auth, response }) {
     try {
-      const usuario = User.findOrFail(request.input('id'));
-
-      if(usuario)
-      {
-        return  usuario;
-      }
-      else
-      {
-        return 'No autorizado';
-      }
-    }
-    catch (error) {
-      return 'No autorizado';
+      await auth.check();
+      
+      const user = auth.user;
+      
+      return response.status(200).json({
+        message: 'Token válido',
+        id: user.id,
+        role: user.role,
+        status: user.status,
+      });
+    } catch (error) {
+      return response.status(401).json({
+        message: 'Token no válido',
+        data: error,
+      });
     }
   }
+  
 }
