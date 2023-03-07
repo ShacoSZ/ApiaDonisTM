@@ -1,6 +1,8 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import Equipo from 'App/Models/Equipo';
+import Database from '@ioc:Adonis/Lucid/Database'
+
 
 export default class EquiposController {
     public async agregar({ request, response }: HttpContextContract) 
@@ -19,12 +21,12 @@ export default class EquiposController {
                 rules.required(),
                 rules.range(0, 20),
               ]),
-              estado_id: schema.number( [
+              estado: schema.number( [
                 rules.required(),
                 rules.range(1,32),
                 rules.exists({ table: 'estados', column: 'id' })
               ]),
-              propietario_id: schema.number( [
+              propietario: schema.number( [
                 rules.required(),
                 rules.range(1,32),
                 rules.exists({ table: 'propietarios', column: 'id' })
@@ -61,19 +63,19 @@ export default class EquiposController {
             },
           });
       
-          const { nombre,division,campeonatos,estado_id,propietario_id } = data;
+          const { nombre,division,campeonatos,estado,propietario } = data;
       
-          const propietario = new Equipo();
-          propietario.nombre = nombre;
-          propietario.division = division;
-          propietario.campeonatos = campeonatos;
-          propietario.estado_id = estado_id;
-          propietario.propietario_id = propietario_id;
+          const equipo = new Equipo();
+          equipo.nombre = nombre;
+          equipo.division = division;
+          equipo.campeonatos = campeonatos;
+          equipo.estado = estado;
+          equipo.propietario = propietario;
 
       
-          await propietario.save();
+          await equipo.save();
       
-          return response.created({ data: propietario });
+          return response.created({ data: equipo });
 
           
         }
@@ -100,12 +102,12 @@ export default class EquiposController {
             rules.required(),
             rules.range(0, 20),
           ]),
-          estado_id: schema.number( [
+          estado: schema.number( [
             rules.required(),
             rules.range(1,32),
             rules.exists({ table: 'estados', column: 'id' })
           ]),
-          propietario_id: schema.number( [
+          propietario: schema.number( [
             rules.required(),
             rules.range(1,32),
             rules.exists({ table: 'propietarios', column: 'id' })
@@ -150,11 +152,11 @@ export default class EquiposController {
           equipo.nombre = data.nombre;
           equipo.division = data.division;
           equipo.campeonatos = data.campeonatos;
-          equipo.estado_id = data.estado_id;
-          equipo.propietario_id = data.propietario_id;
+          equipo.estado = data.estado;
+          equipo.propietario = data.propietario;
           await equipo.save();
           
-        return response.created({ data: equipo });
+        return response.status(200).json({data: equipo});
         }
         return response.notFound({error: 'Equipo no encontrado'});
       
@@ -181,7 +183,14 @@ export default class EquiposController {
 
     public async mostrar({ response}: HttpContextContract)
     {
-      const equipo = await Equipo.all();
+      const equipo = await Database
+      .from('estados')
+      .select('equipos.id', 'equipos.nombre', 'equipos.division', 'equipos.campeonatos', 'estados.nombre as estado', 'propietarios.nombre as propietario')
+      .join('equipos', 'estados.id', '=', 'equipos.estado')
+      .join('propietarios', 'propietarios.id', '=', 'equipos.propietario')
+      .orderBy('equipos.id', 'asc')
+      
+
 
       if(equipo)
       {

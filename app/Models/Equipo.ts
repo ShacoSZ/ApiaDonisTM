@@ -15,10 +15,10 @@ export default class Equipo extends BaseModel {
   public campeonatos: number
 
   @column()
-  public estado_id: number
+  public estado: number
 
   @column()
-    public propietario_id: number
+    public propietario: number
   
 
 
