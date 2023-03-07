@@ -75,14 +75,12 @@ export default class EquiposController {
       
           await equipo.save();
       
-          return response.created({ data: equipo });
-
+          return response.status(201).json({data: equipo})
           
         }
          catch (error) 
-         {
-          
-          response.badRequest(error.messages);
+         {          
+          response.status(400).json(error.messages)
         }
     }
 
@@ -185,9 +183,9 @@ export default class EquiposController {
     {
       const equipo = await Database
       .from('estados')
-      .select('equipos.id', 'equipos.nombre', 'equipos.division', 'equipos.campeonatos', 'estados.nombre as estado', 'propietarios.nombre as propietario')
       .join('equipos', 'estados.id', '=', 'equipos.estado')
       .join('propietarios', 'propietarios.id', '=', 'equipos.propietario')
+      .select('equipos.id', 'equipos.nombre', 'equipos.division', 'equipos.campeonatos', 'estados.nombre as estado', 'propietarios.nombre as propietario')
       .orderBy('equipos.id', 'asc')
       
 

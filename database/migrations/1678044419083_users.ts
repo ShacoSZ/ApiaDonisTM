@@ -9,7 +9,7 @@ export default class extends BaseSchema {
       table.string('name')
       table.string('email', 255).notNullable().unique()
       table.string('password', 180).notNullable()
-      table.string('phone', 10).notNullable().unique()
+      table.string('phone', 10).notNullable()
       table.string('remember_me_token').nullable()
       table.integer('role').unsigned().references('id').inTable('roles').onDelete('CASCADE').onUpdate('CASCADE').defaultTo(3);
       table.bigInteger('code').nullable();

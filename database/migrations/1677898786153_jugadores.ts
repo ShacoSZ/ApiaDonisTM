@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.string('ap_materno',20);
       table.string('sexo',1);
       table.date('f_nac');
-      table.integer('equipo_id').unsigned().references('id').inTable('equipos').onDelete('CASCADE').onUpdate('CASCADE');
+      table.integer('equipo').unsigned().references('id').inTable('equipos').onDelete('CASCADE').onUpdate('CASCADE');
 
 
       /**

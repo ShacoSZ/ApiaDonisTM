@@ -1,5 +1,6 @@
  import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
  import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import Database from '@ioc:Adonis/Lucid/Database';
     import Jugador from 'App/Models/Jugador';
 export default class JugadoresController 
 {
@@ -26,7 +27,7 @@ export default class JugadoresController
                     rules.sexo(),
                     ]),
             f_nac: schema.date(),
-            equipo_id: schema.number( [
+            equipo: schema.number( [
                 rules.required(),
                 rules.range(1,32),
                 rules.exists({ table: 'equipos', column: 'id' })
@@ -60,7 +61,7 @@ export default class JugadoresController
                 },
             });
 
-            const { nombre, ap_paterno, ap_materno, sexo, f_nac, equipo_id } = data
+            const { nombre, ap_paterno, ap_materno, sexo, f_nac, equipo } = data
             const jugador = new Jugador();
             
             jugador.nombre = nombre
@@ -68,9 +69,9 @@ export default class JugadoresController
             jugador.ap_materno = ap_materno
             jugador.sexo = sexo
             jugador.f_nac = f_nac
-            jugador.equipo_id = equipo_id
+            jugador.equipo = equipo
             await jugador.save()
-           return response.status(201).json({ data: jugador});
+           return response.status(200).json({ data: jugador});
 
         }
         catch (error)
@@ -107,7 +108,7 @@ export default class JugadoresController
             f_nac: schema.date({}, [
                 rules.required(),
                 ]),
-            equipo_id: schema.number( [
+            equipo: schema.number( [
                 rules.required(),
                 rules.range(1,32),
                 rules.exists({ table: 'equipos', column: 'id' })
@@ -150,7 +151,7 @@ export default class JugadoresController
                 jugador.ap_materno = data.ap_materno
                 jugador.sexo = data.sexo
                 jugador.f_nac = data.f_nac
-                jugador.equipo_id = data.equipo_id
+                jugador.equipo = data.equipo
                 await jugador.save()
                 return response.status(200).json({ message: 'Jugador actualizado', data: jugador })
             }
@@ -172,9 +173,15 @@ export default class JugadoresController
 
     }
 
-    public mostrar({ response }: HttpContextContract)
+    public  async mostrar({ response }: HttpContextContract)
     {
-        const jugadores = Jugador.all()
+        
+
+        const jugadores = await Database
+      .from('jugadors')
+      .join('equipos', 'jugadors.equipo', '=', 'equipos.id')
+      .select('jugadors.id', 'jugadors.nombre','jugadors.ap_paterno','jugadors.ap_materno','jugadors.sexo','jugadors.f_nac','equipos.nombre as equipo')
+      .orderBy('equipos.id', 'asc')
 
         if (jugadores)
         {

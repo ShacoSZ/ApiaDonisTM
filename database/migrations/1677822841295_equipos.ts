@@ -10,8 +10,8 @@ export default class extends BaseSchema {
       table.bigInteger('division')
       table.bigInteger('campeonatos')
 
-      table.integer('estado_id').unsigned().references('id').inTable('estados').onUpdate('CASCADE').onDelete('CASCADE').nullable()
-      table.integer('propietario_id').unsigned().references('id').inTable('propietarios').onUpdate('CASCADE').onDelete('CASCADE').nullable()
+      table.integer('estado').unsigned().references('id').inTable('estados').onUpdate('CASCADE').onDelete('CASCADE').nullable()
+      table.integer('propietario').unsigned().references('id').inTable('propietarios').onUpdate('CASCADE').onDelete('CASCADE').nullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

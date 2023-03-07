@@ -26,7 +26,7 @@ Route.get('/', async () => {
 
 //Usuarios--Logeo y registro
 Route.group(() => {
-  Route.post('/register', 'UsersController.register').as('register') 
+  Route.post('/usuarios/register', 'UsersController.register').as('register') 
   Route.post('/login', 'UsersController.login').as('login')
   Route.post('/logout', 'UsersController.logout').as('logout').middleware('auth')
 })

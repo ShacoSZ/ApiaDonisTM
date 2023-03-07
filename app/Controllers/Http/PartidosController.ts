@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import Database from '@ioc:Adonis/Lucid/Database';
 import Partido from 'App/Models/Partido'
 
 
@@ -149,7 +150,12 @@ export default class PartidosController
 
     public async mostrar({response }: HttpContextContract)
     {
-        const partido  = await Partido.all();
+        const partido = await Database
+      .from('partidos')
+      .join('equipos', 'equipos.id', '=', 'partidos.local')
+      .join('equipos as visitante', 'visitante.id', '=', 'partidos.visitante')
+     .select('partidos.id','equipos.nombre as local','visitante.nombre as visitante','partidos.fecha','partidos.hora')
+      .orderBy('equipos.id', 'asc')
         if (partido)
         {
             return partido;

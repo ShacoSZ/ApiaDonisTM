@@ -22,7 +22,7 @@ export default class Jugador extends BaseModel {
   public sexo: string
 
   @column()
-  public equipo_id: number
+  public equipo: number
 
   
 
