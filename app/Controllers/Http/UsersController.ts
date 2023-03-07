@@ -5,6 +5,8 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import User from 'App/Models/User'
 import Route from '@ioc:Adonis/Core/Route'
 import Mail from '@ioc:Adonis/Addons/Mail'
+import Env from '@ioc:Adonis/Core/Env'
+
 
 
 
@@ -57,7 +59,6 @@ export default class UsersController
             });
 
             const { name, email, password, phone } = data;
-
                 const user = new User();
                 user.name = name;
                 user.email = email;
@@ -65,30 +66,27 @@ export default class UsersController
                 user.phone = phone;
             
             await user.save();
+                        
+            const enviarCodigo = Env.get('SERVER')+ Route.makeSignedUrl ('enviarCodigo', {id:user.id},{expiresIn: '1h'})
 
-          const enviarCodigo = Route.makeSignedUrl ('AuthController.enviarCodigo', [user.id],
-            {'expiresIn': '1h', 'propose': 'enviarCodigo',})
-
-          /*const verificarCodigo = Route.makeSignedUrl('AuthController.verificarCodigo', [user.id],
-            {    'expiresIn': '1h','propose': 'verificarCodigo',})          
-            */
+            const verificarCodigo =Env.get('SERVE') +Route.makeSignedUrl('verificarCodigo', {id:user.id},{expiresIn: '1h'})          
+            
                 await Mail.send((message) => 
                 {
                     message
                         .from('pabloalvaradovazquez10@gmail.com')
                         .to(request.input('email'))
                         .subject('Verificación de correo')
-                        .htmlView('emails/correo', {user,enviarCodigo} )
+                        .htmlView('emails/correo', {url:enviarCodigo,user:user} )
                 })
                 return response.status(201).json({
                     message: 'Usuario registrado correctamente',
                     user: user,
                     id: user.id,
-                    url: enviarCodigo,
+                    url: verificarCodigo,
                 });
 
         
-
         } 
         catch (error) {
             return response.status(400).json({
@@ -96,31 +94,6 @@ export default class UsersController
                 data: error,
             });
         }
-    }
-
-    public async enviarCorreo({request,response}: HttpContextContract)
-    {
-
-        try {
-            await Mail.send((message) => {
-                message
-                    .from('pabloalvaradovazquez10@gmail.com')
-                    .to('pabloalvaradovazquez10@gmail.com')
-                    .subject('Verificación de correo')
-                    .htmlView('emails/correo')
-            })
-            return 'Correo enviado'
-        }
-         catch (error) 
-         {
-            return response.status(400).json({
-                message: 'Error al enviar el correo',
-                data: error,
-            });
-        
-        }
-
-        
     }
 
     public async login({ request, response,auth }: HttpContextContract)

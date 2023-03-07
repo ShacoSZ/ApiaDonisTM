@@ -34,9 +34,9 @@ Route.group(() => {
 
 //Auth
 Route.group(() => {
-  Route.get('/enviarCodigo', 'AuthController.enviarCodigo').as('enviarCodigo')
-  Route.post('/verificarCodigo', 'AuthController.verificarCodigo').as('verificarCodigo')
-  Route.post('/reenviarCodigo', 'AuthController.reenviarCodigo').as('reenviarCodigo')
+  Route.get('/enviarCodigo/:id', 'AuthController.enviarCodigo').as('enviarCodigo')
+  Route.post('/verificarCodigo/:id', 'AuthController.verificarCodigo').as('verificarCodigo')
+  Route.post('/reenviarCodigo/:id', 'AuthController.reenviarCodigo').as('reenviarCodigo')
 
   Route.post('verificarToken', 'AuthController.verificarToken').as('verificarToken')
 }).prefix('/auth')
