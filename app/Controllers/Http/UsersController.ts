@@ -66,10 +66,11 @@ export default class UsersController
                 user.phone = phone;
             
             await user.save();
-                        
-            const enviarCodigo = Env.get('SERVER')+ Route.makeSignedUrl ('enviarCodigo', {id:user.id},{expiresIn: '1h'})
+                
+            const verificarCodigo =Env.get('SERVER') +Route.makeSignedUrl('verificarCodigo', {id:user.id},{expiresIn: '1h'})          
+            
+            const enviarCodigo = Env.get('SERVER') +Route.makeSignedUrl ('enviarCodigo', {id:user.id},{expiresIn: '1h'})
 
-            const verificarCodigo =Env.get('SERVE') +Route.makeSignedUrl('verificarCodigo', {id:user.id},{expiresIn: '1h'})          
             
                 await Mail.send((message) => 
                 {
@@ -83,7 +84,7 @@ export default class UsersController
                     message: 'Usuario registrado correctamente',
                     user: user,
                     id: user.id,
-                    url: verificarCodigo,
+                    url: verificarCodigo
                 });
 
         

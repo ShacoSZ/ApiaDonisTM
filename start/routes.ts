@@ -45,8 +45,8 @@ Route.group(() => {
   Route.post('/verificarCodigo/:id', 'AuthController.verificarCodigo').as('verificarCodigo')
   Route.post('/reenviarCodigo/:id', 'AuthController.reenviarCodigo').as('reenviarCodigo')
 
-  Route.post('verificarToken', 'AuthController.verificarToken').as('verificarToken')
-}).prefix('/auth')
+  Route.post('auth/verificarToken', 'AuthController.verificarToken').as('verificarToken')
+})
 
 
 //Funciones administrativas 
