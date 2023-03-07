@@ -183,10 +183,7 @@ export default class UsersController
     {
         try {
             const users = await User.all();
-            return response.status(200).json({
-                message: 'Usuarios obtenidos correctamente',
-                data: users,
-            });
+            return users;
         }
         catch (error) {
             return response.status(400).json({
