@@ -169,6 +169,7 @@ export default class UsersController
             return response.status(200).json({
                 message: 'Sesión cerrada correctamente',
                 data: null,
+                revoked: true,
             });
         }
         catch (error) {
