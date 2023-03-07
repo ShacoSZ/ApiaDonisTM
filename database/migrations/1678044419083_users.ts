@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.string('password', 180).notNullable()
       table.string('phone', 10).notNullable().unique()
       table.string('remember_me_token').nullable()
-      table.integer('role_id').unsigned().references('id').inTable('roles').onDelete('CASCADE').onUpdate('CASCADE').defaultTo(3);
+      table.integer('role').unsigned().references('id').inTable('roles').onDelete('CASCADE').onUpdate('CASCADE').defaultTo(3);
       table.bigInteger('code').nullable();
       table.bigInteger('status').defaultTo(0);
 

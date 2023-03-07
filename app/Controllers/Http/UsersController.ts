@@ -140,7 +140,8 @@ export default class UsersController
                     const token = await auth.use('api').generate(user);
                     return response.status(200).json({
                         message: 'Inicio de sesión exitoso',
-                        data: token
+                        user: user,
+                        token: token.token,
                     });
                 }
                 catch (error) {
@@ -236,7 +237,7 @@ export default class UsersController
             if(user)
             {
                 const role = request.input('role');
-                user.role_id = role;
+                user.role = role;
                 await user.save();
                 return response.status(200).json({
                     message: 'Rol cambiado correctamente',

@@ -20,7 +20,7 @@ export default class User extends BaseModel {
   
 
   @column()
-  public role_id: number
+  public role: number
 
 
   @column()

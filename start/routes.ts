@@ -30,11 +30,18 @@ Route.group(() => {
   Route.post('/login', 'UsersController.login').as('login')
   Route.post('/logout', 'UsersController.logout').as('logout').middleware('auth')
 })
-.prefix('/usuarios')
+
+Route.group(() => {
+Route.get('/user/:id', 'UsersController.mostrarUsuario').as('mostrarUsuario') 
+})
+
+
+
 
 //Auth
 Route.group(() => {
   Route.get('/enviarCodigo/:id', 'AuthController.enviarCodigo').as('enviarCodigo')
+  
   Route.post('/verificarCodigo/:id', 'AuthController.verificarCodigo').as('verificarCodigo')
   Route.post('/reenviarCodigo/:id', 'AuthController.reenviarCodigo').as('reenviarCodigo')
 
