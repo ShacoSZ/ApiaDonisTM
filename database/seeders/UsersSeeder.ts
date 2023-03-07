@@ -3,13 +3,13 @@ import User from 'App/Models/User'
 
 export default class extends BaseSeeder {
   public async run () {
-    User.create({
-      name: 'Administrador',
-      email: 'admin@gmail.com',
-      password: '12345678',
-      phone: 1234567890,
-      role: 1,
-      status: 1
-    });
+    const user = new User();
+    user.name = 'Administrador';
+    user.email = 'admin@gmail.com';
+    user.password = '12345678';
+    user.phone = 1234567890;
+    user.role = 1;
+    user.status = 1;
+    await user.save();
   }
 }
