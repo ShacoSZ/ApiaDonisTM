@@ -101,7 +101,8 @@ export default class AuthController {
 
 
 
-  public async verificarToken({ auth, response }) {
+  public async verificarToken({ auth, response })
+   {
     try {
       await auth.check();
       
