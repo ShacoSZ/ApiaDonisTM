@@ -26,8 +26,11 @@ Route.get('/', async () => {
 
 //Usuarios--Logeo y registro
 Route.group(() => {
-  Route.post('/usuarios/register', 'UsersController.register').as('register') 
+  //ya
+  Route.post('/register', 'UsersController.register').as('register') 
+  //ya
   Route.post('/login', 'UsersController.login').as('login')
+  //ya
   Route.post('/logout', 'UsersController.logout').as('logout').middleware('auth')
 })
 
@@ -40,23 +43,23 @@ Route.get('/user/:id', 'UsersController.mostrarUsuario').as('mostrarUsuario')
 
 //Auth
 Route.group(() => {
+  //ya
   Route.get('/enviarCodigo/:id', 'AuthController.enviarCodigo').as('enviarCodigo')
-  
+  //ya
   Route.post('/verificarCodigo/:id', 'AuthController.verificarCodigo').as('verificarCodigo')
-  Route.post('/reenviarCodigo/:id', 'AuthController.reenviarCodigo').as('reenviarCodigo')
-
-  Route.post('auth/verificarToken', 'AuthController.verificarToken').as('verificarToken')
+  Route.get('/auth/reenviarCodigo/:id', 'AuthController.reenviarCodigo').as('reenviarCodigo')
+  //YA
+  Route.post('/auth/verificarToken', 'AuthController.verificarToken').as('verificarToken')
 })
 
 
-//Funciones administrativas 
+//Funciones administrativas  //ya
 Route.group(() => {
-  Route.get('/', 'UsersController.mostrarUsuarios').as('admin.mostrarUsuarios')
-  Route.put('/rol/:id', 'UsersController.cambiarRol').as('admin.cambiarRol')
-  Route.put('status/:id', 'UsersController.cambiarStatus').as('admin.cambiarStatus')
-  Route.delete('/eliminar/:id', 'UsersController.eliminarUsuario').as('admin.eliminarUsuario')
-})
-.prefix('/admin').middleware('auth')
+  Route.get('/admin/', 'UsersController.mostrarUsuarios').as('admin.mostrarUsuarios')
+  Route.put('/admin/rol/:id', 'UsersController.cambiarRol').as('admin.cambiarRol')
+  Route.put('/admin/status/:id', 'UsersController.cambiarStatus').as('admin.cambiarStatus')
+  Route.delete('/admin/:id', 'UsersController.eliminarUsuario').as('admin.eliminarUsuario')
+}).middleware('auth')
 
 
 //Funciones de usuario y administrador

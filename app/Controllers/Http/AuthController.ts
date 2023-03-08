@@ -68,10 +68,10 @@ export default class AuthController {
 
   }
 
-  public async reenviarCodigo({ response,request,params }: HttpContextContract)
+  public async reenviarCodigo({ response,params }: HttpContextContract)
   {
     
-    const verificarCodigo =Env.get('SERVE') +Route.makeSignedUrl('verificarCodigo', {id:params.id},{expiresIn: '1h'})          
+    const verificarCodigo =Env.get('SERVER') +Route.makeSignedUrl('verificarCodigo', {id:params.id},{expiresIn: '1h'})          
 
     const usuario = await User.findOrFail(params.id);
     
@@ -81,7 +81,7 @@ export default class AuthController {
 
     try 
     {
-          const response = await axios.post('https://rest.nexmo.com/sms/json', {
+           await axios.post('https://rest.nexmo.com/sms/json', {
             from: 'Equipos Api ',
             text: `Tu  nuevo código de verificación  es: ${code}`,
             to: `52${usuario.phone}`,
@@ -89,12 +89,12 @@ export default class AuthController {
             api_secret: 'gbvxqZPChrgzv0W4',
           });
 
-          return verificarCodigo;
+          return response.status(200).json({message: 'Código reenviado',url:verificarCodigo});
           
 
     } catch (error) 
     {
-      return error;
+      return response.status(400).json({message: 'Error al reenviar código'});
     }
   }
 
