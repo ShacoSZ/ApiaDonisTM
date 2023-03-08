@@ -1,9 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
-import Database from '@ioc:Adonis/Lucid/Database';
 import Partido from 'App/Models/Partido'
-
-
+import Database from '@ioc:Adonis/Lucid/Database';
 
 export default class PartidosController 
 {
@@ -133,50 +131,51 @@ export default class PartidosController
        
     }
 
-
     public async eliminar({response,params }: HttpContextContract)
     {
         const partido  = await Partido.findOrFail(params.id);
-        if (partido)
+
+        if(partido)
         {
             await partido.delete();
-            return response.status(200).json({message: 'Partido eliminado correctamente'});
+            return response.status(200).json({message: 'El partido se elimino correctamente'});
         }
-        else
-        {
-            return response.status(400).json({message: 'Error al eliminar partido'});
-        }
+
+        return response.notFound({message: 'El partido no existe.'});
     }
 
     public async mostrar({response }: HttpContextContract)
     {
         const partido = await Database
-      .from('partidos')
-      .join('equipos', 'equipos.id', '=', 'partidos.local')
-      .join('equipos as visitante', 'visitante.id', '=', 'partidos.visitante')
-     .select('partidos.id','equipos.nombre as local','visitante.nombre as visitante','partidos.fecha','partidos.hora')
-      .orderBy('equipos.id', 'asc')
-        if (partido)
+        .from('partidos')
+        .join('equipos', 'equipos.id', '=', 'partidos.local')
+        .join('equipos as visitante', 'visitante.id', '=', 'partidos.visitante')
+        .select('partidos.id','equipos.nombre as local','visitante.nombre as visitante','partidos.fecha','partidos.hora')
+        .orderBy('partidos.id', 'asc')
+
+        if(partido)
         {
             return partido;
         }
-        else{
-            return response.status(400).json({message: 'Error al mostrar partidos'});
+
+        else
+        {
+            return response.notFound({message: 'No hay partidos registrados.'});
         }
     }
 
-    public mostrarUnico({response,params }: HttpContextContract)
+    public async mostrarUnico({ response, params }: HttpContextContract)
     {
-        const partido  =  Partido.find(params.id);
-        if (partido)
+        const partido = Partido.find(params.id);
+
+        if(partido)
         {
             return partido;
         }
-        else{
-            return response.status(400).json({message: 'Error al mostrar partido'});
-        }
 
+        else
+        {
+            return response.notFound({ message: 'El partido no existe.' });
+        }
     }
-    
-        
 }

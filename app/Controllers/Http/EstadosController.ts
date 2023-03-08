@@ -1,138 +1,134 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Estado from 'App/Models/Estado'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
-//import { HttpContext } from "@adonisjs/core/build/standalone";
+import Estado from 'App/Models/Estado'
 
-export default class EstadosController {
-
+export default class EstadosController
+{
     public async agregar({ request, response }: HttpContextContract)
-     {
-        const newEstadoSchema = schema.create({
-          nombre: schema.string([
-            rules.minLength(3),
-            rules.maxLength(20),
-            rules.alpha(),
-            rules.unique({ table: 'estados', column: 'nombre' }),
-          ])
+    {
+        const validacionSchema = schema.create
+        ({
+            nombre: schema.string([
+                rules.required(),
+                rules.minLength(3),
+                rules.maxLength(20),
+            ])
         })
       
         try
-         {
-            const data = await request.validate({
-                    schema: newEstadoSchema,
+        {
+            const data = await request.validate(
+                {
+                    schema: validacionSchema,
                     messages: {
                         'nombre.required': 'El nombre es requerido', 
+                        'nombre.string': 'El nombre debe ser una cadena de caracteres',
                         'nombre.minLength': 'El nombre debe tener al menos 3 caracteres',
                         'nombre.maxLength': 'El nombre debe tener como máximo 20 caracteres',   
-                        'nombre.unique': 'El nombre ya está en uso',
-                        'nombre.string': 'El nombre debe ser una cadena de caracteres',
-                        'nombre.alpha': 'El nombre debe contener solo letras',
                     },
-                });
+                }
+            );
            
-                const { nombre } = data;
+            const { nombre } = data;
             
-                const estado = new Estado();
-                estado.nombre = nombre;
+            const estado = new Estado();
+            estado.nombre = nombre;
+            await estado.save();
             
-                await estado.save();
-            
-                return response.status(201).json({ data: estado });
+            return response.status(201).json({ data: estado });
         }
-         catch (error) 
+
+        catch(error) 
         {  
-          response.badRequest(error.messages);
+          response.badRequest({ message: error.messages });
         }
-      }
-      
+    }
 
     public async editar({ request, params, response }: HttpContextContract) 
     {
         const validationSchema = schema.create
         ({
             nombre: schema.string([
-            rules.unique({ table: 'estados', column: 'nombre'}),
-            rules.maxLength(20),
-            rules.minLength(3),
-            rules.alpha(),
+                rules.required(),
+                rules.maxLength(20),
+                rules.minLength(3),
             ])
         });
 
         try 
         {
-            const data = await request.validate({
-                schema: validationSchema,
-                messages: {
-                'nombre.required': 'El nombre es obligatorio',
-                'nombre.unique': 'El nombre ya está en uso',
-                'nombre.string': 'El nombre debe ser una cadena de caracteres',
-                'nombre.maxLength': 'El nombre debe tener como máximo 20 caracteres',
-                'nombre.minLength': 'El nombre debe tener al menos 3 caracteres',
-                'nombre.alpha': 'El nombre debe contener solo letras',
+            const data = await request.validate(
+                {
+                    schema: validationSchema,
+                    messages: {
+                        'nombre.required': 'El nombre es obligatorio',
+                        'nombre.string': 'El nombre debe ser una cadena de caracteres',
+                        'nombre.maxLength': 'El nombre debe tener como máximo 20 caracteres',
+                        'nombre.minLength': 'El nombre debe tener al menos 3 caracteres',
+                    },
+                }
+            );
 
-                },
-            });
-            const estado = await Estado.find(params.id);
+            const estado = await Estado.findOrFail(params.id);
     
-            if (estado) 
+            if(estado) 
             {
                 estado.nombre = data.nombre;
                 await estado.save();
+
                 return response.status(200).json({ data: estado });
             }
     
-            return response.status(404).json({ message: 'El estado no existe' });
+            return response.notFound({ message: 'El estado no existe.' });
         }
-         catch (error) 
+
+        catch(error) 
         {
-            response.status(400).json({ message: error.messages });
+            response.badRequest({ message: error.messages });
         }
        
     }
 
-    public async eliminar({params,response}:HttpContextContract)
+    public async eliminar({ params, response }:HttpContextContract)
     {
         const estado = await Estado.find(params.id);
 
         if(estado)
         {        
             await estado.delete()
-            return response.status(200).json({message:"el estado se elimino correctamente"});
+            return response.status(200).json({ message:"El estado se elimino correctamente." });
         }
-        return response.status(404).json({message:"el estado no existe"});
-        
+
+        return response.notFound({ message:"El estado no existe." });
     }
 
-
-    public async mostrar({response}:HttpContextContract)
+    public async mostrar({ response }:HttpContextContract)
     {
-        const estado = await Estado.all()
+        const estados = await Estado.query().orderBy('id','asc');
 
-        if (estado)
+        if(estados)
         {
-            return estado
+            return estados
         }
+
         else
         {
-            return response.notFound({ message: 'El estado no existe' });
+            return response.notFound({ message: 'No hay estados registrados.' });
         }
     }
 
-    public async mostrarUnico({params,response}: HttpContextContract)
+    public async mostrarUnico({ params, response }: HttpContextContract)
     {
         const estado = await Estado.find(params.id);
 
-        if (estado)
+        if(estado)
         {
-        return estado   
+            return estado   
         }
+
         else
         {
-            return response.status(404).json({message:"el estado no existe"});
+            return response.notFound({ message:"El estado no existe." });
         }
-
     }
-
-
-
 }

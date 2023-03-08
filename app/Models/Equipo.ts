@@ -18,7 +18,7 @@ export default class Equipo extends BaseModel {
   public estado: number
 
   @column()
-    public propietario: number
+  public propietario: number
   
 
 

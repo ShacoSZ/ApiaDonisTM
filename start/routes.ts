@@ -26,11 +26,8 @@ Route.get('/', async () => {
 
 //Usuarios--Logeo y registro
 Route.group(() => {
-  //ya
   Route.post('/register', 'UsersController.register').as('register') 
-  //ya
   Route.post('/login', 'UsersController.login').as('login')
-  //ya
   Route.post('/logout', 'UsersController.logout').as('logout').middleware('auth')
 })
 
@@ -38,22 +35,16 @@ Route.group(() => {
 Route.get('/user/:id', 'UsersController.mostrarUsuario').as('mostrarUsuario') 
 })
 
-
-
-
 //Auth
 Route.group(() => {
-  //ya
   Route.get('/enviarCodigo/:id', 'AuthController.enviarCodigo').as('enviarCodigo')
-  //ya
   Route.post('/verificarCodigo/:id', 'AuthController.verificarCodigo').as('verificarCodigo')
   Route.get('/auth/reenviarCodigo/:id', 'AuthController.reenviarCodigo').as('reenviarCodigo')
-  //YA
   Route.post('/auth/verificarToken', 'AuthController.verificarToken').as('verificarToken')
 })
 
 
-//Funciones administrativas  //ya
+//Funciones administrativas
 Route.group(() => {
   Route.get('/admin/', 'UsersController.mostrarUsuarios').as('admin.mostrarUsuarios')
   Route.put('/admin/rol/:id', 'UsersController.cambiarRol').as('admin.cambiarRol')
@@ -63,8 +54,6 @@ Route.group(() => {
 
 
 //Funciones de usuario y administrador
-
-
 //Partidos
 Route.group(() => {
   Route.get('/', 'PartidosController.mostrar')
@@ -74,7 +63,6 @@ Route.group(() => {
   Route.get('/:id', 'PartidosController.mostrarUnico')
 })
 .prefix('/partidos')
-
 
 //Jugadores
 Route.group(() => {
@@ -86,7 +74,6 @@ Route.group(() => {
 })
 .prefix('/jugadores')
 
-
 //Equipos
 Route.group(() => {
 Route.get('/', 'EquiposController.mostrar')
@@ -94,9 +81,10 @@ Route.post('/', 'EquiposController.agregar')
 Route.put('/:id', 'EquiposController.editar')
 Route.delete('/:id', 'EquiposController.eliminar')
 Route.get('/:id', 'EquiposController.mostrarUnico')
+Route.get('/equipo/:id', 'EquiposController.mostrarJugadoresCiertoEquipo')
+Route.put('/jugadores/:id', 'EquiposController.cambiarEquipoJugadores')
 })
 .prefix('/equipos')
-
 
 //Propietarios
 Route.group(() => {
