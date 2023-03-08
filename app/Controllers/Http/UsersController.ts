@@ -72,7 +72,7 @@ export default class UsersController
             const enviarCodigo = Env.get('SERVER') +Route.makeSignedUrl ('enviarCodigo', {id:user.id},{expiresIn: '1h'})
 
             
-                await Mail.send((message) => 
+                await Mail.sendLater((message) => 
                 {
                     message
                         .from('pabloalvaradovazquez10@gmail.com')
