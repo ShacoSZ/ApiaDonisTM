@@ -4,15 +4,15 @@ import Role from 'App/Models/Role'
 export default class extends BaseSeeder {
   public async run () {
     const rolAdmin = new Role();
-    rolAdmin.nombre = 'Administrador';
+    rolAdmin.rol = 'Administrador';
     await rolAdmin.save();
 
     const rolModerdor = new Role();
-    rolModerdor.nombre = 'Moderador';
+    rolModerdor.rol = 'Usuario';
     await rolModerdor.save();
 
     const rolUsuario = new Role();
-    rolUsuario.nombre = 'Usuario';
+    rolUsuario.rol = 'Invitado';
     await rolUsuario.save();
   }
 }

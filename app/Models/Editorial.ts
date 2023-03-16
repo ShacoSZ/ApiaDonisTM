@@ -1,7 +1,9 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
-export default class Equipo extends BaseModel {
+export default class Editorial extends BaseModel {
+  static table = 'editoriales'
+
   @column({ isPrimary: true })
   public id: number
 
@@ -9,18 +11,13 @@ export default class Equipo extends BaseModel {
   public nombre: string
 
   @column()
-  public division: number
+  public correo: string
 
   @column()
-  public campeonatos: number
+  public direccion: string
 
   @column()
-  public estado: number
-
-  @column()
-  public propietario: number
-  
-
+  public telefono: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

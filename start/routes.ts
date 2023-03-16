@@ -20,88 +20,96 @@
 
 //probar
 import Route from '@ioc:Adonis/Core/Route'
-Route.get('/', async () => {
-  return { hello: 'Mexico' }
+Route.get('/', async ({ view }) => {
+  const html = await view.render('welcome', {
+    greeting: 'Hello'
+  })
+  
+  return html
 })
+
+Route.get('/ins/:id','verificarsController.telefono').as('verificarTelefono')
+Route.post('/verificarcodigo/:id','verificarsController.codigo').as('codigo')
+
+Route.get('/ValidarToken/:token/:rol',    'UsersController.ValidarToken')
+Route.get('/ValidarRol/:token/:rol',      'UsersController.ValidarRol')
+Route.get('/ValidarEliminar/:token/:rol', 'UsersController.ValidarEliminar')
 
 //Usuarios--Logeo y registro
 Route.group(() => {
-  Route.post('/usuarios/register', 'UsersController.register').as('register') 
-  Route.post('/login', 'UsersController.login').as('login')
-  Route.post('/logout', 'UsersController.logout').as('logout').middleware('auth')
+  Route.post('/reg', 'UsersController.register').as('register') 
+  Route.post('/in', 'UsersController.login').as('login')
+  Route.post('/out', 'UsersController.logout').as('logout').middleware('auth')
 })
 
-Route.group(() => {
-Route.get('/user/:id', 'UsersController.mostrarUsuario').as('mostrarUsuario') 
-})
+// Route.get('Autor','AutoresController.readAutores')
+// Route.get('Categoria','CategoriasController.readCategorias')
+// Route.get('Editorial','EditorialesController.readEditoriales')
+// Route.get('Idioma','IdiomasController.readIdiomas')
+// Route.get('Libro','LibrosController.readLibros')
+// Route.get('LibroDatos','LibrosController.datosLibro')
+// Route.get('Lib/:id','LibrosController.libro').where('id', /^[0-9]+$/)
+// Route.get('Libro_Idioma','LibroIdiomasController.readLibro_Idiomas')
+// Route.get('Libro_Idioma/libro/:id','LibroIdiomasController.libro').where('id', /^[0-9]+$/)
+// Route.get('/consultas/Usuarios', 'UsersController.Usuarios')
+// Route.get('/cambiarR/:id',       'UsersController.cambiarRol')
+// Route.get('/cambiarS/:id',       'UsersController.cambiarStatus')
+// Route.get('/Roles',              'UsersController.roles')
+// Route.get('/Roles/:id/:rol',     'UsersController.actualizarRoles')
 
-//Auth
+// Route.post('Autor','AutoresController.createAutores')
+// Route.put('Autor/:id','AutoresController.updateAutores').where('id', /^[0-9]+$/)
+// Route.post('Categoria','CategoriasController.createCategorias')
+// Route.put('Categoria/:id','CategoriasController.updateCategorias').where('id', /^[0-9]+$/)
+// Route.post('Editorial','EditorialesController.createEditoriales')
+// Route.put('Editorial/:id','EditorialesController.updateEditoriales').where('id', /^[0-9]+$/)
+// Route.post('Idioma','IdiomasController.createIdiomas')
+// Route.put('Idioma/:id','IdiomasController.updateIdiomas').where('id', /^[0-9]+$/)
+// Route.post('Libro','LibrosController.createLibros')
+// Route.put('Libro/:id','LibrosController.updateLibros').where('id', /^[0-9]+$/)
+// Route.post('Libro_Idioma','LibroIdiomasController.createLibro_Idiomas')
+// Route.put('Libro_Idioma/:id','LibroIdiomasController.updateLibro_Idiomas').where('id', /^[0-9]+$/)
+Route.get('idiomas/eventos','IdiomasController.eventos')
 Route.group(() => {
-  Route.get('/enviarCodigo/:id', 'AuthController.enviarCodigo').as('enviarCodigo')
-  Route.post('/verificarCodigo/:id', 'AuthController.verificarCodigo').as('verificarCodigo')
-  Route.get('/auth/reenviarCodigo/:id', 'AuthController.reenviarCodigo').as('reenviarCodigo')
-  Route.post('/auth/verificarToken', 'AuthController.verificarToken').as('verificarToken')
-})
-
-
-//Funciones administrativas
-Route.group(() => {
-  Route.get('/admin/', 'UsersController.mostrarUsuarios').as('admin.mostrarUsuarios')
-  Route.put('/admin/rol/:id', 'UsersController.cambiarRol').as('admin.cambiarRol')
-  Route.put('/admin/status/:id', 'UsersController.cambiarStatus').as('admin.cambiarStatus')
-  Route.delete('/admin/:id', 'UsersController.eliminarUsuario').as('admin.eliminarUsuario')
+  Route.group(() => {
+    Route.group(()=>{
+      Route.get('Autor','AutoresController.readAutores')
+      Route.get('Categoria','CategoriasController.readCategorias')
+      Route.get('Editorial','EditorialesController.readEditoriales')
+      Route.get('Idioma','IdiomasController.readIdiomas')
+      Route.get('Libro','LibrosController.readLibros')
+      Route.get('LibroDatos','LibrosController.datosLibro')
+      Route.get('Lib/:id','LibrosController.libro').where('id', /^[0-9]+$/)
+      Route.get('Libro_Idioma','LibroIdiomasController.readLibro_Idiomas')
+      Route.get('Libro_Idioma/libro/:id','LibroIdiomasController.libro').where('id', /^[0-9]+$/)
+      Route.get('/consultas/Usuarios', 'UsersController.Usuarios')
+      Route.get('/cambiarR/:id',       'UsersController.cambiarRol')
+      Route.get('/cambiarS/:id',       'UsersController.cambiarStatus')
+      Route.get('/Roles',              'UsersController.roles')
+      Route.get('/Roles/:id/:rol',     'UsersController.actualizarRoles')
+      // Route.post('/out', 'Auth/LoginController.logout')
+    }).middleware('rol:1,2,3')
+    Route.group(()=>{
+      Route.post('Autor','AutoresController.createAutores')
+      Route.put('Autor/:id','AutoresController.updateAutores').where('id', /^[0-9]+$/)
+      Route.post('Categoria','CategoriasController.createCategorias')
+      Route.put('Categoria/:id','CategoriasController.updateCategorias').where('id', /^[0-9]+$/)
+      Route.post('Editorial','EditorialesController.createEditoriales')
+      Route.put('Editorial/:id','EditorialesController.updateEditoriales').where('id', /^[0-9]+$/)
+      Route.post('Idioma','IdiomasController.createIdiomas')
+      Route.put('Idioma/:id','IdiomasController.updateIdiomas').where('id', /^[0-9]+$/)
+      Route.post('Libro','LibrosController.createLibros')
+      Route.put('Libro/:id','LibrosController.updateLibros').where('id', /^[0-9]+$/)
+      Route.post('Libro_Idioma','LibroIdiomasController.createLibro_Idiomas')
+      Route.put('Libro_Idioma/:id','LibroIdiomasController.updateLibro_Idiomas').where('id', /^[0-9]+$/)
+    }).middleware('rol:1,2')
+    Route.group(()=>{
+      Route.delete('Autor/:id','AutoresController.deleteAutores').where('id', /^[0-9]+$/)
+      Route.delete('Categoria/:id','CategoriasController.deleteCategorias').where('id', /^[0-9]+$/)
+      Route.delete('Editorial/:id','EditorialesController.deleteEditoriales').where('id', /^[0-9]+$/)
+      Route.delete('Idioma/:id','IdiomasController.deleteIdiomas').where('id', /^[0-9]+$/)
+      Route.delete('Libro/:id','LibrosController.deleteLibros').where('id', /^[0-9]+$/)
+      Route.delete('Libro_Idioma/:id','LibroIdiomasController.deleteLibro_Idiomas').where('id', /^[0-9]+$/)
+    }).middleware('rol:1')
+  }).middleware(['status'])
 }).middleware('auth')
-
-
-//Funciones de usuario y administrador
-//Partidos
-Route.group(() => {
-  Route.get('/', 'PartidosController.mostrar')
-  Route.post('/', 'PartidosController.agregar')
-  Route.put('/:id', 'PartidosController.editar')
-  Route.delete('/:id', 'PartidosController.eliminar')
-  Route.get('/:id', 'PartidosController.mostrarUnico')
-})
-.prefix('/partidos')
-
-//Jugadores
-Route.group(() => {
-  Route.get('/', 'JugadoresController.mostrar')
-  Route.post('/', 'JugadoresController.agregar')
-  Route.put('/:id', 'JugadoresController.editar')
-  Route.delete('/:id', 'JugadoresController.eliminar')
-  Route.get('/:id', 'JugadoresController.mostrarUnico')
-})
-.prefix('/jugadores')
-
-//Equipos
-Route.group(() => {
-Route.get('/', 'EquiposController.mostrar')
-Route.post('/', 'EquiposController.agregar')
-Route.put('/:id', 'EquiposController.editar')
-Route.delete('/:id', 'EquiposController.eliminar')
-Route.get('/:id', 'EquiposController.mostrarUnico')
-Route.get('/equipo/:id', 'EquiposController.mostrarJugadoresCiertoEquipo')
-Route.put('/jugadores/:id', 'EquiposController.cambiarEquipoJugadores')
-})
-.prefix('/equipos')
-
-//Propietarios
-Route.group(() => {
-  Route.get('/', 'PropietariosController.mostrar')
-  Route.post('/', 'PropietariosController.agregar')
-  Route.put('/:id', 'PropietariosController.editar')
-  Route.delete('/:id', 'PropietariosController.eliminar')
-  Route.get('/:id', 'PropietariosController.mostrarUnico')
-})
-.prefix('/propietarios')
-
-//Estados
-Route.group(() => {
-    Route.get('/', 'EstadosController.mostrar')
-    Route.post('/', 'EstadosController.agregar')
-    Route.put('/:id', 'EstadosController.editar')
-    Route.delete('/:id', 'EstadosController.eliminar')
-    Route.get('/:id', 'EstadosController.mostrarUnico')
-  })
-.prefix('/estados')

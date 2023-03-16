@@ -1,22 +1,15 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 
-export default class Partido extends BaseModel {
+export default class Autor extends BaseModel {
+  static table = 'autores'
+
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public local: number
+  public nombre: string
 
-  @column()
-  public visitante: number
-
-  @column.date()
-  public fecha: DateTime
-
-  @column.dateTime()
-  public hora: DateTime
-  
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

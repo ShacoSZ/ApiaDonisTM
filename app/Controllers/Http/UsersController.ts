@@ -5,7 +5,10 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import User from 'App/Models/User'
 import Route from '@ioc:Adonis/Core/Route'
 import Mail from '@ioc:Adonis/Addons/Mail'
-import Env from '@ioc:Adonis/Core/Env'
+//import Env from '@ioc:Adonis/Core/Env'
+import Role from 'App/Models/Role'
+const local = "http://192.168.119.190:3333"
+
 
 
 
@@ -15,153 +18,145 @@ export default class UsersController
 
     public async register({ request, response }: HttpContextContract)
     {
-        const validationSchema = schema.create({
-            name: schema.string({ trim: true }, [
-                rules.minLength(3),
-                rules.maxLength(50),
-            ]),
-            email: schema.string({ trim: true }, [
-                rules.email(),
-                rules.unique({ table: 'users', column: 'email' }),
-            ]),
-            password: schema.string({ trim: true }, [
-                rules.minLength(8),
-                rules.maxLength(50),
-            ]),
-            phone: schema.number([
-                rules.required()
-            ]),
-
+        console.log(request.all())
+        try
+        {
+          await request.validate({
+            schema: schema.create({
+                name: schema.string(),
+                email: schema.string(
+                ),
+                password: schema.string(),
+                phone: schema.number(),
+            }),
+            messages: {
+                required: 'El campo {{ field }} es obligatorio.',
+            }
         })
-
-        try {
-            const data = await request.validate({
-                schema: validationSchema,
-                messages: {
-                    'name.required': 'El nombre es requerido',
-                    'name.string': 'El nombre debe ser un texto',
-                    'name.minLength': 'El nombre debe tener al menos 3 caracteres',
-                    'name.maxLength': 'El nombre debe tener como máximo 50 caracteres',
-
-                    'email.required': 'El email es requerido',
-                    'email.string': 'El email debe ser un texto',
-                    'email.email': 'El email debe ser un email válido',
-                    'email.unique': 'El email ya está en uso',
-                    
-                    'password.required': 'La contraseña es requerida',
-                    'password.string': 'La contraseña debe ser un texto',
-                    'password.minLength': 'La contraseña debe tener al menos 8 caracteres',
-                    'password.maxLength': 'La contraseña debe tener como máximo 50 caracteres',
-
-                    'phone.required': 'El teléfono es requerido',
-                    'phone.number': 'El teléfono debe ser un número',
-                },
+    
+            const user = await User.create({
+              name: request.input('name'),
+              email: request.input('email'),
+              password: request.input('password'),
+              phone: request.input('phone'),
+              rol_id: 2,
+            })
+    
+            const URL2 = local + Route.makeSignedUrl('codigo', {id: user.id},{ expiresIn: '30m' })
+            const URL = local + Route.makeSignedUrl('verificarTelefono', {id: user.id},{ expiresIn: '30m' })
+            
+            try {
+              await Mail.sendLater((message) => {
+                  message
+                      .from('alejandrosalazarcom25@gmail.com')
+                      .to(user.email)
+                      .subject('Verifica Tu Cuenta!')
+                      .htmlView('emails/primero', {
+                          user: { name: user.name },
+                          url: URL,
+                      })
+              })
+          
+              return response.status(201).json({
+                message: 'Usuario registrado correctamente',
+                data: user,
+                url: URL2,
             });
-
-            const { name, email, password, phone } = data;
-                const user = new User();
-                user.name = name;
-                user.email = email;
-                user.password = await Hash.make(password);
-                user.phone = phone;
+    
+            return response.ok({
+              'status': 201,
+              'mensaje': 'Usuario registrado correctamente',
+              'error': [],
+              'data': user,
+              'url': URL2,
+          })
             
-            await user.save();
-                
-            const verificarCodigo =Env.get('SERVER') +Route.makeSignedUrl('verificarCodigo', {id:user.id},{expiresIn: '1h'})          
-            
-            const enviarCodigo = Env.get('SERVER') +Route.makeSignedUrl ('enviarCodigo', {id:user.id},{expiresIn: '1h'})
-
-            
-                await Mail.sendLater((message) => 
-                {
-                    message
-                        .from('pabloalvaradovazquez10@gmail.com')
-                        .to(request.input('email'))
-                        .subject('Verificación de correo')
-                        .htmlView('emails/correo', {url:enviarCodigo,user:user} )
-                })
-                return response.status(201).json({
-                    message: 'Usuario registrado correctamente',
-                    user: user,
-                    id: user.id,
-                    url: verificarCodigo
-                });
-
-        
-        } 
-        catch (error) {
-            return response.status(400).json({
-                message: 'Error al registrar el usuario',
-                data: error,
-            });
+          } catch (error) {
+              console.log(error)
+              return response.status(500).json({
+                  status: 500,
+                  mensaje: 'Error al enviar el correo electrónico',
+                  error: error.message,
+                  data: null,
+                  url: null,
+              })
+          }
+          
+        }
+        catch(error)
+        {
+          console.log(error)
+          return response.status(500).json({
+              status: 500,
+              mensaje: 'Error al enviar el correo electrónico',
+              error: error.message,
+              data: null,
+              url: null,
+          })
         }
     }
 
     public async login({ request, response,auth }: HttpContextContract)
     {
-        const validationSchema = schema.create({
-            email: schema.string({ trim: true }, [
-                rules.email(),
-            ]),
-            password: schema.string({ trim: true }, [
-                rules.minLength(8),
-                rules.maxLength(50),
-            ]),
-
-        })
-
-        try {
-            const data = await request.validate({
-                schema: validationSchema,
-                messages: {
-                    'email.required': 'El email es requerido',
-                    'email.string': 'El email debe ser un texto',
-                    'email.email': 'El email debe ser un email válido',
-
-                    'password.required': 'La contraseña es requerida',
-                    'password.string': 'La contraseña debe ser un texto',
-                    'password.minLength': 'La contraseña debe tener al menos 8 caracteres',
-                    'password.maxLength': 'La contraseña debe tener como máximo 50 caracteres',
-                },
-            });
-
-            const { email, password } = data;
-
-            const user = await User.findByOrFail('email', email);
-
-            if (!(await Hash.verify(user.password, password)))
-             {
-                return response.status(400).json({
-                    message: 'Email o contraseña incorrectos',
-                    data: null,
-                });
-            }
-            
-                try {
-                    const token = await auth.use('api').generate(user);
-                    return response.status(200).json({
-                        message: 'Inicio de sesión exitoso',
-                        user: user,
-                        token: token.token,
-                    });
-                }
-                catch (error) {
-                    return response.status(400).json({
-                        message: 'Error al iniciar sesión',
-                        data: error,
-                    });
-                }
-
-        } catch (error) {
-            return response.status(400).json({
-                message: 'Error al iniciar sesión',
-                data: error,
-            });
-        }
+        await request.validate({
+          schema: schema.create({
+              email: schema.string([
+                  rules.email(),
+                  rules.trim(),
+              ]),
+              password: schema.string([
+                  rules.maxLength(20),
+                  rules.trim(),
+              ]),
+          }),
+          messages: {
+              required: 'El campo {{ field }} es obligatorio.',
+              string: 'El campo {{ field }} debe ser una cadena de caracteres.',
+              trim: 'El campo {{ field }} no debe contener espacios en blanco.',
+              email: 'El campo {{ field }} debe ser un correo electrónico válido.',
+              maxLength: 'El campo {{ field }} debe tener un máximo de {{ options.maxLength }} caracteres.',
+          }
+      })
+    
+      const user = await User.query().where('email', request.input('email')).where('status', '1').first()
+    
+      if (!user) {
+          return response.badRequest({
+              'status': 400,
+              'mensaje': 'No existe ningún usuario con este correo o su cuenta está desactivada.',
+              'error': [],
+              'data': [],
+          })
+      }
+    
+      if(!await Hash.verify(user.password, request.input('password'))) {
+          return response.badRequest({
+              'status': 400,
+              'mensaje': 'Credenciales de usuario incorrectas.',
+              'error': [],
+              'data': [],
+          })
+      }
+    
+      const token = await auth.use('api').generate(user)
+      user.rememberMeToken = token.token
+      await user.save()
+    
+      return response.ok({
+          'status': 200,
+          'mensaje': 'Sesión iniciada correctamente.',
+          'error': [],
+          'data': user,
+          'UserID': user.id,
+          'rol_id': user.rol_id,
+          'name'  : user.name,
+          'Token': token.token,
+      })
     }
 
     public async logout({ response, auth }: HttpContextContract)
     {
+        console.log(auth);
         try {
 
 
@@ -181,144 +176,162 @@ export default class UsersController
 
     }
 
-    public async mostrarUsuarios({ response }: HttpContextContract)
+    public async ValidarToken({params,response}: HttpContextContract) 
+  {
+    const user = await User
+    .query()
+    .where('remember_me_token', params.token)
+    .first()
+    if(user)
     {
-        try {
-            const users = await User.all();
-            return users;
-        }
-        catch (error) {
-            return response.status(400).json({
-                message: 'Error al obtener los usuarios',
-                data: error,
-            });
-        }
+      if(user.status == 1 && user.rol_id == params.rol)
+      {
+        return response.ok({
+          'status': 200,
+          'mensaje': true,
+      })
+      }
+      else
+      {
+        return response.badRequest({
+          'status': 400,
+          'mensaje': false,
+      })
+      }
     }
-
-    public async eliminarUsuario({ params, response }: HttpContextContract)
+    else
     {
-        try {
-            const user = await User.findOrFail(params.id);
-            await user.delete();
-            return response.status(200).json({
-                message: 'Usuario eliminado correctamente',
-                data: user,
-            });
-        }
-        catch (error) {         
-            return response.status(400).json({
-                message: 'Error al eliminar el usuario',
-                data: error,
-            });
-        }
+      return response.badRequest({
+        'status': 400,
+        'mensaje': false,
+    })
     }
+    
+  }
 
-    public async cambiarRol ({ params, request, response }: HttpContextContract)
+  public async ValidarRol({params,response}: HttpContextContract) 
+  {
+    const user = await User
+    .query()
+    .where('remember_me_token', params.token)
+    .first()
+    if(user)
     {
-        try {
-            const validationSchema = schema.create({
-                role: schema.number([
-                    rules.required()
-                ]),
-            })
-            const data = await request.validate({
-                schema: validationSchema,
-                messages: {
-                    'role.required': 'El rol es requerido',
-                    'role.number': 'El rol debe ser un número',
-                },
-            });
-
-
-
-            const user = await User.findOrFail(params.id);
-            
-            if(user)
-            {
-                const role = request.input('role');
-                user.role = role;
-                await user.save();
-                return response.status(200).json({
-                    message: 'Rol cambiado correctamente',
-                    data: user,
-                });
-            }
-            else
-            {
-                return response.status(400).json({
-                    message: 'Error al cambiar el rol',
-                    data: null,
-                });
-            }
-        }
-        catch (error) {
-            return response.status(400).json({
-                message: 'Error al cambiar el rol',
-                data: error,
-            });
-        }
-
+      if(user.status == 1 && user.rol_id == params.rol && (user.rol_id == 1 || user.rol_id == 2))
+      {
+        return response.ok({
+          'status': 200,
+          'mensaje': true,
+      })
+      }
+      else
+      {
+        return response.badRequest({
+          'status': 400,
+          'mensaje': false,
+      })
+      }
     }
+    else
+    {
+      return response.badRequest({
+        'status': 400,
+        'mensaje': false,
+    })
+    }
+  }
 
-    public async cambiarStatus ({ params, request, response }: HttpContextContract)
-       {
-              try {
-                        const validationSchema = schema.create({
-                                status: schema.number([
-                                    rules.required()
-                                ]),
-                        })
-                        const data = await request.validate({
-                                schema: validationSchema,
-                                messages: {
-                                    'status.required': 'El status es requerido',
-                                    'status.number': 'El status debe ser un número',
-                                },
-                        });
-                        const user = await User.findOrFail(params.id);
-                        if(user)
-                        {
-                                const status = request.input('status');
-                                user.status = status;
-                                await user.save();
-                                return response.status(200).json({
-                                    message: 'Status cambiado correctamente',
-                                    data: user,
-                                });
-                        }
-                        else
-                        {
-                                return response.status(400).json({
-                                    message: 'Error al cambiar el status',
-                                    data: null,
-                                });
-                        }
-                }
-                catch (error) {
-                        return response.status(400).json({
-                            message: 'Error al cambiar el status',
-                            data: error,
-                        });
-                }
+  public async ValidarEliminar({params,response}: HttpContextContract) 
+  {
+    const user = await User
+    .query()
+    .where('remember_me_token', params.token)
+    .first()
+    if(user)
+    {
+      if(user.status == 1 && user.rol_id == params.rol && user.rol_id == 1)
+      {
+        return response.ok({
+          'status': 200,
+          'mensaje': true,
+      })
+      }
+      else
+      {
+        return response.badRequest({
+          'status': 400,
+          'mensaje': false,
+      })
+      }
+    }
+    else
+    {
+      return response.badRequest({
+        'status': 400,
+        'mensaje': false,
+    })
+    }
+  }
 
-       }
-       
-       public async mostrarUsuario({ params, response }: HttpContextContract)
-       {
-           try {
-               const user = await User.findOrFail(params.id);
-               return response.status(200).json({
-                   message: 'Usuario obtenido correctamente',
-                   data: user,
-               });
-           }
-           catch (error) {
-               return response.status(400).json({
-                   message: 'Error al obtener el usuario',
-                   data: error,
-               });
-           }
-           
-       }
+  public async Usuarios({}: HttpContextContract) 
+  {
+    const users = await User
+    .query()
+    .select('users.id','users.name','users.email','users.phone','users.status','roles.rol')
+    .join('roles','users.rol_id','roles.id')
+
+    return users
+  }
+
+  public async roles({}: HttpContextContract) 
+  {
+    const roles = await Role.all()
+    return roles
+  }
+
+  public async actualizarRoles({params}: HttpContextContract) 
+  {
+    const user = await User.find(params.id)
+    if(user?.rol_id == 1)
+    {
+      user.rol_id = 2
+      await user.save()
+    }
+    else if(user?.rol_id == 2)
+    {
+      user.rol_id = 3
+      await user.save()
+    }
+    else if(user?.rol_id == 3)
+    {
+      user.rol_id = 1
+      await user.save()
+    }
+  }
+
+  public async cambiarRol({params}: HttpContextContract) 
+  {
+    const user = await User.find(params.id)
+    if(user)
+    {
+      user.rol_id = params.rol
+      await user.save()
+    }
+  }
+
+  public async cambiarStatus({params}: HttpContextContract) 
+  {
+    const user = await User.find(params.id)
+    if(user?.status == 1)
+    {
+      user.status = 0
+      await user.save()
+    }
+    else if(user?.status == 0)
+    {
+      user.status = 1
+      await user.save()
+    }
+  }
 
 }

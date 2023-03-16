@@ -1,15 +1,14 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import User from 'App/Models/User'
-import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class extends BaseSeeder {
   public async run () {
     const user = new User();
     user.name = 'Administrador';
-    user.email = 'admin@gmail.com';
-    user.password = await Hash.make('12345678');
+    user.email = "admin@gmail.com";
+    user.password = "123456789"
     user.phone = 1234567890;
-    user.role = 1;
+    user.rol_id = 1;
     user.status = 1;
     await user.save();
   }
