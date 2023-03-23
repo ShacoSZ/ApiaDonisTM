@@ -42,34 +42,9 @@ Route.group(() => {
   Route.post('/out', 'UsersController.logout').as('logout').middleware('auth')
 })
 
-// Route.get('Autor','AutoresController.readAutores')
-// Route.get('Categoria','CategoriasController.readCategorias')
-// Route.get('Editorial','EditorialesController.readEditoriales')
-// Route.get('Idioma','IdiomasController.readIdiomas')
-// Route.get('Libro','LibrosController.readLibros')
-// Route.get('LibroDatos','LibrosController.datosLibro')
-// Route.get('Lib/:id','LibrosController.libro').where('id', /^[0-9]+$/)
-// Route.get('Libro_Idioma','LibroIdiomasController.readLibro_Idiomas')
-// Route.get('Libro_Idioma/libro/:id','LibroIdiomasController.libro').where('id', /^[0-9]+$/)
-// Route.get('/consultas/Usuarios', 'UsersController.Usuarios')
-// Route.get('/cambiarR/:id',       'UsersController.cambiarRol')
-// Route.get('/cambiarS/:id',       'UsersController.cambiarStatus')
-// Route.get('/Roles',              'UsersController.roles')
-// Route.get('/Roles/:id/:rol',     'UsersController.actualizarRoles')
 
-// Route.post('Autor','AutoresController.createAutores')
-// Route.put('Autor/:id','AutoresController.updateAutores').where('id', /^[0-9]+$/)
-// Route.post('Categoria','CategoriasController.createCategorias')
-// Route.put('Categoria/:id','CategoriasController.updateCategorias').where('id', /^[0-9]+$/)
-// Route.post('Editorial','EditorialesController.createEditoriales')
-// Route.put('Editorial/:id','EditorialesController.updateEditoriales').where('id', /^[0-9]+$/)
-// Route.post('Idioma','IdiomasController.createIdiomas')
-// Route.put('Idioma/:id','IdiomasController.updateIdiomas').where('id', /^[0-9]+$/)
-// Route.post('Libro','LibrosController.createLibros')
-// Route.put('Libro/:id','LibrosController.updateLibros').where('id', /^[0-9]+$/)
-// Route.post('Libro_Idioma','LibroIdiomasController.createLibro_Idiomas')
-// Route.put('Libro_Idioma/:id','LibroIdiomasController.updateLibro_Idiomas').where('id', /^[0-9]+$/)
-Route.get('idiomas/eventos','IdiomasController.eventos')
+Route.get('stream','IdiomasController.streamIngredientes')
+
 Route.group(() => {
   Route.group(() => {
     Route.group(()=>{

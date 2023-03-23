@@ -2,11 +2,11 @@
 import { schema } from '@ioc:Adonis/Core/Validator'
 import Idioma from 'App/Models/Idioma'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-// import Event from '@ioc:Adonis/Core/Event'
-// import { Readable } from 'stream';
+// import Env from '@ioc:Adonis/Core/Env'
+import Event from '@ioc:Adonis/Core/Event'
 
 export default class IdiomasController {
-    public async createIdiomas({request})
+    public async createIdiomas({request,response}:HttpContextContract)
     {
         
         await request.validate({
@@ -17,11 +17,19 @@ export default class IdiomasController {
                 required: 'El campo {{ field }} es obligatorio'
             }
         })
-        const idioma = await Idioma.create({
+        var idioma = await Idioma.create({
             idioma: request.body().idioma
         })
         //Event.emit('new:idioma', idioma)
-        return idioma
+        Event.emit('new:ingrediente', idioma)
+
+        return response.created({
+            'status': 201,
+            'mensaje': 'Los datos fueron almacenados correctamente.',
+            'error': [],
+            'data': idioma
+          })
+//        return idioma
     }
 
     public async readIdiomas()
@@ -29,39 +37,6 @@ export default class IdiomasController {
         const idiomas = await Idioma.all()
         return idiomas
     }
-
-    public async eventos({response}:HttpContextContract)
-    {
-        response.header('Content-Type','text/event-stream');
-        response.header('Cache-Control','no-cache');
-        response.header('Connection','keep-alive');
-
-        const idiomas = await Idioma.all()
-
-        response.send(`event: notice\ndata: ${JSON.stringify(idiomas)}\n\n`)
-    }
-
-    // public async stream({ response }) {
-    //     const streamA = new Readable();
-    //     streamA._read = () => {};
-    //     const idiomas = await Idioma.all();
-    //     const data = {
-    //         message: 'Nuevos datos disponibles',
-    //         idiomas
-    //     };
-    //     streamA.push(`data: ${JSON.stringify(data)}\n\n`);
-    //     // setInterval(sendEvent, 5000);
-    //     // response.on('close', () => {
-    //     //   clearInterval(intervalId);
-    //     //   stream.destroy();
-    //     // });
-    //     // response.writeHead(200, {
-    //     //   'Content-Type': 'text/event-stream',
-    //     //   'Cache-Control': 'no-cache',
-    //     //   'Connection': 'keep-alive'
-    //     // });
-    //     streamA.pipe(response);
-    // }
 
     public async updateIdiomas({params , request})
     {
@@ -77,7 +52,8 @@ export default class IdiomasController {
                 }
             })
             idioma.idioma = request.body().idioma
-            idioma.save()
+            await idioma.save()
+            Event.emit('update:ingrediente', idioma)
             return idioma
         }
         else
@@ -92,11 +68,36 @@ export default class IdiomasController {
         if(idioma)
         {
             await idioma.delete()
+            Event.emit('delete:ingrediente', idioma)
             return {message:"Categoria eliminado correctamente"}
         }
         else
         {
             return {message:"Categoria no encontrado"}
         }
+    }
+
+    public async streamIngredientes({response}){
+        const stream = response.response;
+        stream.writeHead(200, 
+            {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Access-Control-Allow-Origin': '*',
+            })
+        Event.on('new:ingrediente', (ingrediente) => {
+        console.log(ingrediente)
+        stream.write(`data: ${JSON.stringify("Se agrego un idioma")}\n\n`)
+        });
+        Event.on('update:ingrediente', (ingrediente) => {
+        console.log(ingrediente)
+        stream.write(`data: ${JSON.stringify("Se edito un idioma")}\n\n`)    }
+        );
+        Event.on('delete:ingrediente', (ingrediente) => {
+        console.log(ingrediente)
+        stream.write(`data: ${JSON.stringify("Se elimino un idioma")}\n\n`)
+        }
+        );
     }
 }

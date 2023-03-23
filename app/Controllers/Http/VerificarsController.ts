@@ -18,7 +18,7 @@ export default class VerificarsController {
       await user.save()
 
       const accountSid = 'ACf63b989af81a71902cf5f6837438e15b';
-      const authToken = '963b0c1d533100eeb0e006442c55d6f7';
+      const authToken = 'adca546b451f160ecaf26af54d9c6856';
       const client = require('twilio')(accountSid, authToken);
       
       client.messages

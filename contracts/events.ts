@@ -5,6 +5,10 @@
  * file.
  */
 
+import Idioma from "App/Models/Idioma";
+
+// import Idioma from "App/Models/Idioma";
+
 declare module '@ioc:Adonis/Core/Event' {
   /*
   |--------------------------------------------------------------------------
@@ -26,6 +30,9 @@ declare module '@ioc:Adonis/Core/Event' {
   |
   */
   interface EventsList {
-    'new:idioma':{id:number}
+    'new:ingrediente': Idioma,
+    'update:ingrediente': Idioma,
+    'delete:ingrediente': Idioma
+    //
   }
 }

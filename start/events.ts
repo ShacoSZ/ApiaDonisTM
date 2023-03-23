@@ -9,4 +9,4 @@
 */
 import Event from '@ioc:Adonis/Core/Event'
 
-Event.on('new:idioma', 'Idioma.onNewIdioma')
+Event.on('Notificacion','NotificacionesListener.onNewNotificacion')

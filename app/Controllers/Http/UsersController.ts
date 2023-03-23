@@ -7,7 +7,7 @@ import Route from '@ioc:Adonis/Core/Route'
 import Mail from '@ioc:Adonis/Addons/Mail'
 //import Env from '@ioc:Adonis/Core/Env'
 import Role from 'App/Models/Role'
-const local = "http://192.168.119.190:3333"
+const local = "http://192.168.117.54:3333"
 
 
 
